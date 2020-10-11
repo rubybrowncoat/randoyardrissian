@@ -287,37 +287,69 @@ const makeFrom = (letters = [], sentence = '', group = null, sideGroups = [], pr
   return makeFrom(remainingLetters, sentence, json[selectedLetters][selection] ? json[selectedLetters][selection].children : null, selectionSidegroups, nextSet)
 }
 
-const groups = Object.keys(json)
-for (let times = 0; times < 20; times += 1) {
-  const sampleKey = _sample(groups)
-  const keys = Object.keys(json[sampleKey])
+const program = async () => {
+  const groups = Object.keys(json)
+  for (let times = 0; times < 1; times += 1) {
+    const sampleKey = _sample(groups)
+    const keys = Object.keys(json[sampleKey])
 
-  const word = cleanUp(_sample(keys)).toUpperCase()
+    // const word = cleanUp(_sample(keys)).toUpperCase()
+    const word = 'MFSMLLAIUP'
 
-  if (word.length > 1) {
-    const starter = makeFrom(word.split(''))
+    if (word.length > 1) {
+      const starter = makeFrom(word.split(''))
 
-    // CLEAN UP UNPAIRED ELEMENTS
-    let sentence = starter
-    for (let parityResult = checkParity(sentence); Array.isArray(parityResult) && !!parityResult.length;) {
-      progress = true
-      const [culpritIndex, ] = parityResult.pop()
+      // CLEAN UP UNPAIRED ELEMENTS
+      let sentence = starter
+      for (let parityResult = checkParity(sentence); Array.isArray(parityResult) && !!parityResult.length;) {
+        progress = true
+        const [culpritIndex, ] = parityResult.pop()
 
-      const split = sentence.split('')
-      split.splice(culpritIndex, 1)
+        const split = sentence.split('')
+        split.splice(culpritIndex, 1)
 
-      sentence = split.join('')
+        sentence = split.join('')
 
-      parityResult = checkParity(sentence)
+        parityResult = checkParity(sentence)
+      }
+
+      console.log(word)
+
+      if (DEBUG) console.log(starter)
+
+      console.log(sentence)
+
+      // { // GOOGLE SYNTAX ANALYSIS
+      //   const language = require('@google-cloud/language')
+      //   const client = new language.LanguageServiceClient()
+
+      //   const document = {
+      //     content: sentence,
+      //     language: 'it',
+      //     type: 'PLAIN_TEXT',
+      //   }
+      //   const encodingType = 'UTF8'
+
+      //   const response = await client.analyzeSyntax({
+      //     document, 
+      //     encodingType,
+      //   })
+        
+      //   const syntax = response[0]
+        
+      //   console.log('Tokens:');
+      //   syntax.tokens.forEach(part => {
+      //     console.log(`${part.partOfSpeech.tag}: ${part.text.content}`);
+      //     console.log('Morphology:', part.partOfSpeech);
+      //   })
+
+      //   efes.writeFileSync('./google-language-response', JSON.stringify(response, null, 2))
+      // }
+
+      console.log('')
     }
-
-    console.log(word)
-
-    if (DEBUG) console.log(starter)
-
-    console.log(sentence)
-
-    console.log('')
   }
 }
+
+program()
 

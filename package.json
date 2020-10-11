@@ -6,6 +6,7 @@
   "main": "make-knowledge.js",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/language": "^4.1.1",
     "@msgpack/msgpack": "^2.2.0",
     "lodash": "^4.17.20"
   },
