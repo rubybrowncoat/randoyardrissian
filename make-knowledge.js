@@ -4,9 +4,6 @@ const path = require('path')
 const sbd = require('sbd')
 const junk = require('junk')
 
-const detectCharacterEncoding = require('detect-character-encoding')
-const iconv = require('iconv-lite')
-
 const msgpack = require('@msgpack/msgpack')
 
 const directory = './knowledge-texts'
@@ -37,12 +34,9 @@ const program = async () => {
       continue
     }
 
-    const baseBuffer = efes.readFileSync(filename)
-    const detection = detectCharacterEncoding(baseBuffer)
+    const contents = efes.readFileSync(filename, 'utf-8')
 
-    console.log(filename, detection.encoding)
-
-    const contents = iconv.decode(baseBuffer, detection.encoding)
+    console.log(filename)
 
     const sentences = sbd.sentences(contents, {
       newline_boundaries: true,
