@@ -3,7 +3,6 @@ const { argv } = require('yargs')
 
 const junk = require('junk')
 const chalk = require('chalk')
-const { overArgs } = require('lodash')
 
 const artefacts = ['#', '_', '*', '>', '<']
 
@@ -79,7 +78,7 @@ const program = async () => {
       }
 
       for (const quote of Object.keys(straightQuotes)) {
-        const regexpOpener = new RegExp(`((\\s|[«\\(\\[])\\${quote}|\\s\\${quote}«)`, 'g')
+        const regexpOpener = new RegExp(`((\\s|[«\\(\\[\\{}])\\${quote}|\\s\\${quote}«)`, 'g')
 
         const reported = {}
 
@@ -141,6 +140,7 @@ const program = async () => {
       }
 
       const allPunctuations = [...punctuationOpeners, ...punctuationClosers]
+      const allPunctuationsAndStraightQuotes = [...allPunctuations, ...Object.keys(straightQuotes)]
       for (const punctuation of allPunctuations) {
         const regexp = new RegExp(`[^\\s\\${allPunctuations.join('\\')}]\\${punctuation}[^\\s\\${allPunctuations.join('\\')}]`, 'g')
 
@@ -148,6 +148,8 @@ const program = async () => {
         while (match = singleMatch(regexp, contents)) {
           if (['.', ',', ':'].includes(punctuation) && match.input[match.index].match(/\d/) && match.input[match.index + 2].match(/\d/)) continue
           if (punctuation === '.' && match.input[match.index + match.extent] === '.') continue
+          if (punctuation === '.' && match.input[match.index].match(new RegExp('n', 'i')) && match.input[match.index - 1].match(new RegExp(`[\\s\\${allPunctuationsAndStraightQuotes.join('\\')}]`))) continue
+          if (punctuation === '.' && match.input[match.index].match(new RegExp('t', 'i')) && match.input[match.index - 1].match(new RegExp('r', 'i')) && match.input[match.index - 2].match(new RegExp('a', 'i')) && match.input[match.index - 3].match(new RegExp(`[\\s\\${allPunctuationsAndStraightQuotes.join('\\')}]`))) continue
           if (punctuation === '’' && match.input[match.index + match.extent] === '’') continue
 
           console.log(chalk.bgRedBright.black(` BAD `) + chalk.bgYellow.black(' OR NOT? '), getMatchPreview(match))
@@ -164,7 +166,7 @@ const program = async () => {
       }
 
       if (argv.accent) { // FAKE ACCENTS?
-        const regexp = new RegExp(`(?<!be|co|da|de|di|du|fa|fe|fra|mo|ne|pe|pie|po|que|se|sta|to|tra|va|ve)[‘’\']\\s`, 'gi')
+        const regexp = new RegExp(`(?<!artel|be|co|da|de|di|du|fa|fe|fra|mo|ne|pe|pie|po|que|se|sta|to|tra|va|ve)[‘’\']\\s`, 'gi')
         
         let match
         while (match = singleMatch(regexp, contents)) {
@@ -174,7 +176,7 @@ const program = async () => {
       
       if (argv.weird) { // WEIRDNESS
         {
-          const regexp = new RegExp(`(l[’‘]|l'\\s)`, 'gi')
+          const regexp = new RegExp(`((?<!arte)l[’‘]|l'\\s)`, 'gi')
           
           let match
           while (match = singleMatch(regexp, contents)) {
@@ -183,7 +185,7 @@ const program = async () => {
         }
         
         {
-          const regexp = new RegExp(`[“«\\(\\[\\{\\s](be|co|da|de|di|du|e|fa|fe|fra|mo|ne|pe|pie|po|que|se|sta|to|tra|va|ve)”`, 'gi')
+          const regexp = new RegExp(`[“«\\(\\[\\{\\s](artel|be|co|da|de|di|du|e|fa|fe|fra|mo|ne|pe|pie|po|que|se|sta|to|tra|va|ve)”`, 'gi')
           
           let match
           while (match = singleMatch(regexp, contents)) {
@@ -192,11 +194,17 @@ const program = async () => {
         }
       }
 
-      { // RETURNS AND SPACERS
-        const regexpReturns = new RegExp('\\n\\n+', 'g')
+      { // GENERIC STATES
+        const regexpNoters = new RegExp('(?<![‘\\d+])(?<!\\sn.|\\sart.)(\\d+([\\.-]\\d+)?)+(?<!1\\d\\d\\d)(?<!\\d{2}-\\d{2})(?<!\\d{4}-\\d{2})([\\(\\)\\[\\]\\{\\}«‘“!\\?\\.,;:\\s»])(?!gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre|rubli|franchi)(?!\\d+)(Vedi nota \\d+\\.)*', 'g')
+        if (singleMatch(regexpNoters, contents)) {
+          debugger
+          console.log(chalk.bgMagentaBright.black(` CONTAINS POTENTIAL NUMERAL BLOCKERS `))
+        }
+
+        const regexpReturns = new RegExp('\\r?\\n(\\r?\\n)+', 'g')
         if (singleMatch(regexpReturns, contents)) {
           debugger
-          console.log(chalk.bgCyan.black(` NEEDS RETURN SQUASHING `), chalk.bgGreen.bold(` REPLACE ${chalk.bgBlueBright('\\n\\n+')} WITH ${chalk.bgBlueBright('\\s')}`))
+          console.log(chalk.bgCyan.black(` NEEDS RETURN SQUASHING `), chalk.bgGreen.bold(` REPLACE ${chalk.bgBlueBright('\\r?\\n(\\r?\\n)+')} WITH ${chalk.bgBlueBright('\\s')}`))
         }
 
         const regexpSpacers = new RegExp('\\s\\s+', 'g')

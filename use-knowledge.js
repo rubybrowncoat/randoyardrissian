@@ -294,7 +294,7 @@ const program = async () => {
     const keys = Object.keys(json[sampleKey])
 
     // const word = cleanUp(_sample(keys)).toUpperCase()
-    const word = 'MFSMLLAIUP'
+    const word = 'COLCAZZO'
 
     if (word.length > 1) {
       const starter = makeFrom(word.split(''))

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pgr:powergrep xmlns:pgr="http://www.powergrep.com/powergrep52.xsd" version="5.2">
+	<actionfile>
+		<fileselection globalmasks="1">
+			<convertformats name="None">
+				<pdf masks="*.pdf"/>
+				<word masks="*.do[ct]"/>
+				<docx masks="*.do[ct][xm]"/>
+				<odt masks="*.odt;*.sxw"/>
+				<wri masks="*.wri"/>
+				<wp masks="*.wp;*.wp[d456]"/>
+				<xps masks="*.xps;*.oxps"/>
+				<xls masks="*.xls"/>
+				<xlsx masks="*.xls[xm]"/>
+				<quattro masks="*.wq[12];*.wb[123];*.qpw;*.wkq"/>
+				<lotus masks="*.wk[s134]"/>
+				<audio masks="*.mp[1234ag];*.m4[ab];*.flac;*.fl[ac];*.wav;*.wave;*.wv;*.alac;*.aif;*.aif[fc];*.afc&#13;&#10;*.og[ag];*.ape;*.mpc;*.ofr;*.opus;*.dsf;*.rf64;*.bwf"/>
+				<wma masks="*.wm[av];*.asf"/>
+				<exif masks="*.jpg;*.jpeg;*.tif;*.tiff;*.psd"/>
+				<rtf masks="*.rtf">
+					<mode>raw</mode>
+				</rtf>
+				<html masks="*.html;*.htm;*.shtml;*.hta">
+					<mode>raw</mode>
+				</html>
+				<mht masks="*.mht;*.mhtml"/>
+				<eml masks="*.eml"/>
+				<outlook masks="*.msg;winmail.dat"/>
+				<cdr masks="*.cd[rt]"/>
+				<acetext masks="*.atc">
+					<mode>raw</mode>
+				</acetext>
+				<lnk masks="*.lnk"/>
+				<zip masks="*.epub;*.thmx;*.kmz;*.ae[as];*.hmxz;*.hmskin"/>
+				<chm masks="*.chm;*.hxs"/>
+				<comments>Do not convert any files.  Exclude files that are not searchable without conversion.</comments>
+			</convertformats>
+			<archiveformats name="None">
+				<zip masks="*.zip;*.[ejw]ar;*.xpi"/>
+				<zipx masks="*.zipx"/>
+				<seven masks="*.7z"/>
+				<gz masks="*.gz"/>
+				<bz2 masks="*.bz2;*.bzip2"/>
+				<lzma masks="*.lzma"/>
+				<xz masks="*.xz"/>
+				<tar masks="*.tar"/>
+				<tgz masks="*.tgz;*.tar.gz"/>
+				<tbz masks="*.tbz;*.tbz2;*.tar.bz2;*.tar.bzip2"/>
+				<tlzma masks="*.tlzma;*.tar.lzma"/>
+				<txz masks="*.txz;*.tar.xz"/>
+				<cpio masks="*.cpio"/>
+				<cpgz masks="*.cpgz;*.cpio.gz"/>
+				<cpbz masks="*.cpbz;*.cpbz2;*.cpio.bz2;*.cpio.bzip2"/>
+				<cplzma masks="*.cplzma;*.cpio.lzma"/>
+				<cpxz masks="*.cpxz;*.cpio.xz"/>
+				<arj masks="*.arj"/>
+				<cab masks="*.cab"/>
+				<deb masks="*.deb"/>
+				<lha masks="*.lha;*.lzh"/>
+				<rar masks="*.rar"/>
+				<rpm masks="*.rpm"/>
+				<xar masks="*.xar"/>
+				<mbox masks="*.mbx;INBOX;Sent"/>
+				<pst masks="*.[op]st"/>
+				<oe5 masks="*.dbx"/>
+				<fat masks="*.fat"/>
+				<iso masks="*.iso;*.[mu]df"/>
+				<ntfs masks="*.ntfs"/>
+				<ext masks="*.ext;*.ext[234]"/>
+				<hfs masks="*.hfs"/>
+				<wim masks="*.wim;*.swm"/>
+				<comments>Do not decompress any files.  Do not search inside archives, disk images, or mailboxes.</comments>
+			</archiveformats>
+			<dataformats name="Specific auto detection" dataformat="win1252" binary="1" unicode="1" writebom="1" preservebom="1">
+				<format name="Text files" masks="*.txt" dataformat="win1252" unicode="1" writebom="1"/>
+				<format name="XML files" masks="*.xml;*.dtd;*.xhtml;*.xsl;*.xslt;*.xsd" dataformat="utf8" xml="1"/>
+				<format name="HTML files" masks="*.htm;*.html;*.asp;*.aspx;*.php" dataformat="win1252" html="1" unicode="1"/>
+				<format name="RTF files" masks="*.rtf" dataformat="win1252"/>
+				<format name="Source code files" masks="*.cs;*.bas;*.vb;*.java;*.pas;*.dfm;*.c;*.cpp;*.h;*.hpp;*.pl;*.py" dataformat="win1252" unicode="1" preservebom="1"/>
+				<format name="Binary files" masks="*.gif;*.png;*.jpg;*.jpeg;*.exe;*.dll" dataformat="bytes"/>
+				<comments>Perform quick automatic Unicode detection on all files.  Perform slower automatic detection of XML declarations and HTML charset tags only on files with extensions used for XML and HTML files.</comments>
+			</dataformats>
+			<hideformats name="Backup, working, versioning, and hidden" hidden="1" system="1" regex="1" masksfiles="\.bak\d*$;\.~[^.]*$;^Backup [0-9]+ of&#13;&#10;^Working copy of;^~\$.*\.(?:xls|doc|ppt)[xm]?" masksfolders="\.bak\d*$;\.~[^.]*$;^Backup [0-9]+ of;^__history$&#13;&#10;^__recovery$&#13;&#10;^\.svn$;^Sync Issues">
+				<comments>Hide all files and folders that look like backup copies or like working copies.  Hide all folders used by version control systems.  Also hide all files and folders that have the hidden or system attribute set.</comments>
+			</hideformats>
+			<drive name="C:">
+				<folder name="Users">
+					<folder name="Matsor Browncoat">
+						<folder name="Documents">
+							<folder name="eBooks">
+								<folder name="randoyardrissian">
+									<folder name="base_knowledge-texts" mark="recurse">
+										<file name="karenina.txt" mark="unmarked"/>
+										<file name="metodo.txt" mark="unmarked"/>
+										<file name="miserabili.txt" mark="unmarked"/>
+										<file name="mobydick.txt" mark="unmarked"/>
+										<file name="ombrascorpione.txt" mark="marked"/>
+										<file name="principelettere.txt" mark="marked"/>
+										<file name="segreteidentità.txt" mark="marked"/>
+										<file name="seipersonaggipirandello.txt" mark="marked"/>
+										<file name="sherlockholmes.txt" mark="marked"/>
+										<file name="signoreanelli1.txt" mark="marked"/>
+										<file name="signoreanelli2.txt" mark="marked"/>
+										<file name="signoreanelli3.txt" mark="marked"/>
+										<file name="thegame.txt" mark="marked"/>
+										<file name="tirannide.txt" mark="marked"/>
+										<file name="unregnoinombra.txt" mark="marked"/>
+										<file name="vecchigiovani.txt" mark="marked"/>
+										<file name="worldwarz.txt" mark="marked"/>
+										<file name="zarathustranietzsche.txt" mark="marked"/>
+										<file name="zeno.txt" mark="marked"/>
+									</folder>
+								</folder>
+							</folder>
+						</folder>
+					</folder>
+				</folder>
+			</drive>
+		</fileselection>
+		<action actiontype="replace" searchtype="regex" concurrent="1" targettype="same" backuptype="multi name" backupdest="same folder">
+			<searchtext>(?&lt;![‘\d+])(?&lt;![\s«\(]n.|[\s«\(]art.|[\s«\(]pag.)(\d+([\.-]\d+)?)+(?&lt;!1\d\d\d)(?&lt;!\d{2}-\d{2})(?&lt;!\d{4}-\d{2})([\(\)\[\]\{\}«‘“!\?\.,;:\s»])(?!gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre|rubli|franchi)(?!\d+)(Vedi nota \d+\.)*</searchtext>
+			<replacetext>\3</replacetext>
+			<sectioning sectiontype="whole file"/>
+			<context contexttype="line" numbering="1" extra="context"/>
+		</action>
+	</actionfile>
+</pgr:powergrep>
