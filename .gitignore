@@ -104,6 +104,12 @@ dist
 .tern-port
 
 # Rando
+/knowledge.json
 /knowledge.msp
+/knowledge-sentencar.json
+/knowledge-sentencar.msp
+/knowledge-markovio.json
+/sentences.json
+
 /Yarda-0b09d9c24fb9.json
 /base_knowledge-texts/

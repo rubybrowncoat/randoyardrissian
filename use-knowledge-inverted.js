@@ -3,6 +3,7 @@ const msgpack = require('@msgpack/msgpack')
 
 const _sample = require('lodash/sample')
 const _without = require('lodash/without')
+const { reverse } = require('lodash')
 
 if (!efes.existsSync('./knowledge.msp')) {
     console.log('### MAKE KNOWLEDGE FIRST')
@@ -146,25 +147,29 @@ const getGroupItems = (group, previousLetter, nextLetter, reduction) => Object.e
   return whole
 }, [])
 
-const makeFrom = (letters = [], sentence = '', group = null, sideGroups = [], preselectedLetters = null) => {
+const makeFrom = (letters = [], isReversed = false, sentence = [], group = null, sideGroups = [], preselectedLetters = null) => {
   const flowPotentials = []
   const groupPotentials = []
   const globalPotentials = []
 
   if (!letters.length) {
-    let trimmed = sentence.trim()
+    const result = isReversed ? [...sentence].reverse() : [...sentence]
+    let finale = result.pop().trim()
 
-    const lastCharacter = trimmed.slice(-1)
+    const lastCharacter = finale.slice(-1)
     if (softPunctuation.includes(lastCharacter)) {
-      trimmed = trimmed.replace(/.$/, _sample(hardPunctuation))
+      finale = finale.replace(/.$/, _sample(hardPunctuation))
     } else if (!punctuation.includes(lastCharacter)) {
-      trimmed += _sample(hardPunctuation)
+      finale += _sample(hardPunctuation)
     }
 
-    return trimmed
+    result.push(finale)
+
+    return result
   }
 
-  let letterSets = preselectedLetters ? [preselectedLetters] : []
+  const preselectedRemainder = preselectedLetters && letters.slice(preselectedLetters.length)
+  const letterSets = preselectedLetters ? [preselectedLetters] : []
   if (!letterSets.length) {
     for (let offset = 0; offset < letters.length; offset += 1) {
       letterSets.push(offset ? letters.slice(0, -offset) : letters)
@@ -174,7 +179,11 @@ const makeFrom = (letters = [], sentence = '', group = null, sideGroups = [], pr
   if (DEBUG) console.log('letterSets', letterSets.map(set => set.join('')).join(', '))
 
   letterSets.forEach(set => {
-    const remainder = letters.slice(set.length)
+    if (isReversed) {
+      set.reverse()
+    }
+
+    const remainder = preselectedRemainder || (isReversed ? [...letters].reverse() : letters).slice(set.length)
     const letterString = set.join('')
 
     const remainderSets = []
@@ -208,7 +217,7 @@ const makeFrom = (letters = [], sentence = '', group = null, sideGroups = [], pr
     })
 
     if (json[letterString]) {
-      globalPotentials.push([letterString, Object.fromEntries(Object.entries(json[letterString]).map(([key, value]) => [key, value.size, null]))])
+      globalPotentials.push([letterString, Object.fromEntries(Object.entries(json[letterString]).map(([key, value]) => [key, value.size, null])), null])
     }
   })
 
@@ -216,7 +225,7 @@ const makeFrom = (letters = [], sentence = '', group = null, sideGroups = [], pr
   const potentialSets = [flowPotentials, groupPotentials, globalPotentials]
 
   //
-  const sentenceCap = sentence.slice(-1)
+  const sentenceCap = (sentence.slice(-1) || '').slice(-1)
 
   let selectedLetters
   let remainingLetters
@@ -236,7 +245,7 @@ const makeFrom = (letters = [], sentence = '', group = null, sideGroups = [], pr
 
       selectedLetters = sampledPotential[0]
       nextSet = sampledPotential[2]
-      remainingLetters = letters.slice(selectedLetters.length)
+      remainingLetters = preselectedRemainder || (isReversed ? [...letters].reverse() : letters).slice(selectedLetters.length)
 
       exclusions.push(selectedLetters)
 
@@ -276,15 +285,15 @@ const makeFrom = (letters = [], sentence = '', group = null, sideGroups = [], pr
     }
   }
 
-  sentence += ` ${selection}`
+  sentence.push(selection)
 
   const cleanSelection = cleanUp(selection)
   const selectionSidesteps = Object.keys(json[selectedLetters]).filter(key => cleanUp(key) === cleanSelection)
-  const selectionSidegroups = selectionSidesteps.map(key => json[selectedLetters][key].children)
+  const selectionSidegroups = selectionSidesteps.map(key => json[selectedLetters][key].parents)
 
   // if (DEBUG) console.log('SIDEGROUPS', selectionSidegroups)
 
-  return makeFrom(remainingLetters, sentence, json[selectedLetters][selection] ? json[selectedLetters][selection].children : null, selectionSidegroups, nextSet)
+  return makeFrom(remainingLetters, isReversed, sentence, json[selectedLetters][selection] ? json[selectedLetters][selection].parents : null, selectionSidegroups, nextSet)
 }
 
 const program = async () => {
@@ -297,27 +306,65 @@ const program = async () => {
     const word = 'VRSETALT'
 
     if (word.length > 1) {
-      const starter = makeFrom(word.split(''))
-
-      // CLEAN UP UNPAIRED ELEMENTS
-      let sentence = starter
-      for (let parityResult = checkParity(sentence); Array.isArray(parityResult) && !!parityResult.length;) {
-        progress = true
-        const [culpritIndex, ] = parityResult.pop()
-
-        const split = sentence.split('')
-        split.splice(culpritIndex, 1)
-
-        sentence = split.join('')
-
-        parityResult = checkParity(sentence)
-      }
-
       console.log(word)
 
-      if (DEBUG) console.log(starter)
+      const results = []
+      const splitWord = word.split('')
 
-      console.log(sentence)
+      // Normal
+      results.push(makeFrom(splitWord))
+      
+      // Reversed
+      results.push(makeFrom([...splitWord].reverse(), true))
+
+      // Split Origination
+      const origination = splitWord.map((letter) => {
+        const letterWords = json[letter]
+        if (!letterWords) {
+          return false
+        }
+
+        const sampler = Object.keys(letterWords).reduce((aggregate, word) => {
+          const wordSize = letterWords[word].size
+
+          for (let iterator = 0; iterator < wordSize; iterator += 1) {
+            aggregate.push(word)
+          }
+          
+          return aggregate
+        }, [])
+
+        return sampler
+      })
+      const maxOriginationLength = Math.max(...origination.map(items => Array.isArray(items) && items.length))
+      const preselection = origination.map((items, index) => [index, items && items.length > (maxOriginationLength * 0.75) && _sample(items)]).filter(([, items]) => !!items)
+      
+      const [splitIndex, originWord] = _sample(preselection)
+
+      const preLetters = splitWord.slice(0, splitIndex)
+      const postLetters = splitWord.slice(splitIndex + 1)
+
+      results.push([...makeFrom(preLetters, true, [originWord]).slice(0, -1), originWord, ...makeFrom(postLetters, false, [originWord]).slice(1)])
+
+      results.forEach(sentenceGroup => {
+        let sentence = sentenceGroup.join(' ')
+
+        for (let parityResult = checkParity(sentence); Array.isArray(parityResult) && !!parityResult.length;) {
+          progress = true
+          const [culpritIndex, ] = parityResult.pop()
+  
+          const split = sentence.split('')
+          split.splice(culpritIndex, 1)
+  
+          sentence = split.join('')
+  
+          parityResult = checkParity(sentence)
+        }
+  
+        if (DEBUG) console.log(starter)
+  
+        console.log(sentence)
+      })
 
       // { // GOOGLE SYNTAX ANALYSIS
       //   const language = require('@google-cloud/language')

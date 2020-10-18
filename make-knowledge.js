@@ -90,6 +90,7 @@ const program = async () => {
             letterGroup[compositeLowercase] = {
               size: 0,
               children: {},
+              parents: {},
             }
           }
 
@@ -99,7 +100,19 @@ const program = async () => {
 
           if (previous) {
             const previousLetters = getLetters(previous)
+            
+            // Add as parent of child
+            if (!cleanGroup.parents[previousLetters]) {
+              cleanGroup.parents[previousLetters] = {}
+            }
 
+            if (!cleanGroup.parents[previousLetters][previous]) {
+              cleanGroup.parents[previousLetters][previous] = 0
+            }
+
+            cleanGroup.parents[previousLetters][previous] += 1
+
+            // Add as child of parent
             if (!repository[previousLetters][previous].children[letters]) {
               repository[previousLetters][previous].children[letters] = {}
             }
@@ -135,6 +148,7 @@ const program = async () => {
   const encoded = msgpack.encode(repository)
   const buffer = Buffer.from(encoded.buffer, encoded.byteOffset, encoded.byteLength)
 
+  efes.writeFileSync('knowledge.json', JSON.stringify(repository, null, 2))
   efes.writeFileSync('knowledge.msp', buffer)
 }
 
